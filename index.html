@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 智能多功能衝刺站</title>
+    <title>個人專屬衝刺站</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root { --bg: #131314; --card-bg: #1e1f20; --text: #e3e3e3; --primary: #a8c7fa; --border: #444746; --accent: #ff7675; --ring-bg: #2b2a2a; }
@@ -11,7 +11,6 @@
         .wrapper { width: 100%; max-width: 1100px; }
         .card { background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         
-        /* 登入 */
         #login-section { text-align: center; max-width: 400px; margin: 100px auto; }
         input { padding: 12px; background: #2b2a2a; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; margin-bottom: 10px; box-sizing: border-box; width: 100%; }
         input:focus { outline: none; border-color: var(--primary); }
@@ -23,20 +22,17 @@
         .grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
         @media(max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
-        /* 自訂倒數 */
         .countdown-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
         .cd-item { background: #2b2a2a; padding: 15px; border-radius: 10px; border: 1px solid var(--border); position: relative; text-align: center; }
         .cd-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; font-size: 16px; }
         .cd-time { font-size: 18px; font-family: monospace; letter-spacing: 1px; }
         .del-btn { position: absolute; top: 8px; right: 10px; color: var(--accent); cursor: pointer; font-size: 12px; font-weight: bold; }
 
-        /* 科技感圓環番茄鐘 */
         .timer-container { position: relative; width: 200px; height: 200px; margin: 20px auto; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: conic-gradient(var(--primary) 100%, var(--ring-bg) 0%); box-shadow: 0 0 20px rgba(168, 199, 250, 0.1); transition: background 1s linear; }
         .timer-inner { position: absolute; width: 180px; height: 180px; background: var(--card-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 2; }
         .timer-text { font-size: 42px; font-weight: bold; font-family: monospace; color: var(--text); }
         .pulse { position: absolute; width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 0 0 rgba(168, 199, 250, 0.4); animation: pulsing 2s infinite; display: none; z-index: 1; }
 
-        /* AI 區 */
         .chat-box { height: 400px; overflow-y: auto; padding: 15px; background: #131314; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 15px; }
         .msg { margin-bottom: 12px; padding: 12px 16px; border-radius: 10px; max-width: 85%; line-height: 1.5; word-break: break-all; }
         .user-msg { background: #2b2a2a; margin-left: auto; text-align: right; }
@@ -44,7 +40,6 @@
         .ai-msg strong, .ai-msg b { color: var(--primary); font-weight: bold; }
         .ai-msg pre { background: #2b2a2a; padding: 10px; border-radius: 6px; overflow-x: auto; }
 
-        /* YT Music */
         .ytm-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border); }
         .ytm-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
@@ -56,12 +51,15 @@
 <body>
 
 <div class="wrapper">
+    <!-- 登入介面 -->
     <div id="login-section" class="card">
         <h2>登入</h2>
-        <input type="text" id="username-input" placeholder="輸入名稱或管理員密碼...">
+        <!-- 新增了按 Enter 也能登入的功能 -->
+        <input type="text" id="username-input" placeholder="輸入名稱或管理員密碼..." onkeypress="if(event.key==='Enter') handleLogin()">
         <button onclick="handleLogin()" style="width:100%;">進入</button>
     </div>
 
+    <!-- 主程式介面 -->
     <div id="main-app">
         <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
             <div style="font-size: 18px;">使用者：<span id="user-display" style="color:var(--primary); font-weight:bold;"></span></div>
@@ -106,9 +104,8 @@
 
             <div class="card" style="display: flex; flex-direction: column;">
                 <h3 style="margin-top:0;">AI 諮詢區</h3>
-                
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <input type="password" id="api-key-input" placeholder="請貼上你的 Gemini API Key..." style="margin:0; font-size:12px; flex:1;">
+                    <input type="password" id="api-key-input" placeholder="請貼上你的 API Key (AQ. 開頭)..." style="margin:0; font-size:12px; flex:1;">
                     <button onclick="saveApiKey()" style="padding:0 10px; font-size:12px; background:var(--border); color:var(--text);">儲存 Key</button>
                 </div>
 
@@ -121,6 +118,7 @@
         </div>
     </div>
 
+    <!-- 管理員後台 -->
     <div id="admin-dashboard" class="card">
         <h2 style="color:var(--primary); margin-top:0;">🛡️ 後台管理系統</h2>
         <table>
@@ -170,7 +168,6 @@
         document.getElementById("main-app").style.display = "block";
         document.getElementById("user-display").innerText = user;
         
-        // 載入 API Key
         const savedKey = localStorage.getItem(`gemini_key_${currentUser}`);
         if(savedKey) { document.getElementById("api-key-input").value = savedKey; }
 
@@ -186,10 +183,9 @@
     function saveApiKey() {
         const key = document.getElementById("api-key-input").value.trim();
         localStorage.setItem(`gemini_key_${currentUser}`, key);
-        alert("API Key 已儲存至本地瀏覽器！");
+        alert("API Key 已儲存！");
     }
 
-    // YT Music
     function saveAndLoadYtm() {
         let url = document.getElementById("ytm-url").value.trim();
         if(!url) return;
@@ -207,7 +203,6 @@
     }
     function renderYtmEmbed(url) { document.getElementById("ytm-player-area").innerHTML = `<div class="ytm-container"><iframe src="${url}" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>`; }
 
-    // 倒數計時
     function addCountdown() {
         const name = document.getElementById("cd-name").value.trim();
         const dateStr = document.getElementById("cd-date").value;
@@ -242,7 +237,6 @@
         });
     }
 
-    // 番茄鐘
     function toggleTimer() {
         const ring = document.getElementById("timer-ring");
         const pulse = document.getElementById("pulse-bg");
@@ -272,7 +266,7 @@
     }
     function updateTimerDisplay() { document.getElementById("timer").innerText = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`; }
 
-// 升級後的 AI 呼叫程式碼（會印出 Google 真實的錯誤訊息）
+    // 升級版 AI 抓 Bug 程式碼
     async function sendChat() {
         const input = document.getElementById("chat-input");
         const text = input.value.trim();
@@ -280,7 +274,7 @@
 
         const apiKey = localStorage.getItem(`gemini_key_${currentUser}`);
         if(!apiKey) {
-            alert("請先在上方輸入你的 Gemini API Key！");
+            alert("請先在上方輸入並儲存你的 API Key！");
             return;
         }
 
@@ -305,20 +299,28 @@
             const data = await response.json();
             document.getElementById("gemini-loading").remove();
 
-            // 如果有正常收到回答
             if(data.candidates && data.candidates[0].content.parts[0].text) {
                 const reply = data.candidates[0].content.parts[0].text;
                 appendMessage(reply, 'ai-msg');
                 saveChat(text, reply);
-            } 
-            // 如果遇到 Google 新版 AQ 金鑰的 Bug 或限制，直接把原因印在畫面上
-            else if (data.error) {
-                appendMessage(`❌ **Google API 拒絕連線！**\n原因：${data.error.message}\n*(錯誤代碼：${data.error.code})*`, 'ai-msg');
+            } else if (data.error) {
+                appendMessage(`❌ **連線被拒絕！**\n原因：${data.error.message}\n*(錯誤代碼：${data.error.code})*`, 'ai-msg');
             } else {
-                appendMessage("AI 回傳了未知的格式，請稍後再試。", 'ai-msg');
+                appendMessage("未知的格式錯誤。", 'ai-msg');
             }
         } catch (error) {
             if(document.getElementById("gemini-loading")) document.getElementById("gemini-loading").remove();
-            appendMessage("連線失敗！請檢查網路狀態。", 'ai-msg');
+            appendMessage("網路連線失敗，請稍後再試。", 'ai-msg');
         }
     }
+
+    function appendMessage(text, className) {
+        const box = document.getElementById("chat-box"); const div = document.createElement("div");
+        div.className = `msg ${className}`; div.innerHTML = className === 'ai-msg' ? marked.parse(text) : text;
+        box.appendChild(div); box.scrollTop = box.scrollHeight;
+    }
+    function saveChat(u, a) { let h = JSON.parse(localStorage.getItem(`chat_history_${currentUser}`) || "[]"); h.push({user: u, ai: a}); localStorage.setItem(`chat_history_${currentUser}`, JSON.stringify(h)); }
+    function loadChatHistory() { const box = document.getElementById("chat-box"); box.innerHTML = ""; let h = JSON.parse(localStorage.getItem(`chat_history_${currentUser}`) || "[]"); h.forEach(item => { appendMessage(item.user, 'user-msg'); appendMessage(item.ai, 'ai-msg'); }); }
+</script>
+</body>
+</html>
