@@ -3,100 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini 風格段考衝刺站</title>
+    <title>個人專屬衝刺站</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        :root { --bg: #131314; --card-bg: #1e1f20; --text: #e3e3e3; --primary: #a8c7fa; --border: #444746; }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .wrapper { width: 100%; max-width: 1000px; }
-        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        :root { --bg: #131314; --card-bg: #1e1f20; --text: #e3e3e3; --primary: #a8c7fa; --border: #444746; --accent: #ff7675; --ring-bg: #2b2a2a; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .wrapper { width: 100%; max-width: 1100px; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         
-        /* 登入區 */
+        /* 登入 */
         #login-section { text-align: center; max-width: 400px; margin: 100px auto; }
-        input { padding: 12px; width: 80%; background: #2b2a2a; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 16px; margin-bottom: 15px; }
-        button { background: var(--primary); color: #131314; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        
-        /* 主配置 */
+        input { padding: 12px; background: #2b2a2a; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; margin-bottom: 10px; box-sizing: border-box; width: 100%; }
+        input:focus { outline: none; border-color: var(--primary); }
+        button { background: var(--primary); color: #131314; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.2s; }
+        button:hover { filter: brightness(1.1); transform: scale(0.98); }
+        button.secondary { background: var(--border); color: var(--text); }
+
         #main-app, #admin-dashboard { display: none; }
         .grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
-        @media(max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-        
-        /* 倒數 */
-        .countdown { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
-        .tile { background: #2b2a2a; padding: 10px; border-radius: 8px; min-width: 60px; text-align: center; }
-        .tile-num { font-size: 24px; font-weight: bold; color: var(--primary); }
+        @media(max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
-        /* 字卡 */
-        .flashcard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .flashcard { background: #28292a; padding: 15px; border-radius: 8px; border: 1px solid var(--border); text-align: center; cursor: pointer; font-weight: bold; color: var(--primary); }
+        /* 自訂倒數 */
+        .countdown-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
+        .cd-item { background: #2b2a2a; padding: 15px; border-radius: 10px; border: 1px solid var(--border); position: relative; text-align: center; }
+        .cd-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; font-size: 16px; }
+        .cd-time { font-size: 18px; font-family: monospace; letter-spacing: 1px; }
+        .del-btn { position: absolute; top: 8px; right: 10px; color: var(--accent); cursor: pointer; font-size: 12px; font-weight: bold; }
 
-        /* AI 聊天室 */
-        .chat-box { height: 300px; overflow-y: auto; padding: 10px; background: #1e1f20; border-radius: 8px; margin-bottom: 10px; }
-        .msg { margin-bottom: 12px; padding: 10px; border-radius: 8px; max-width: 85%; }
+        /* 科技感圓環番茄鐘 */
+        .timer-container { position: relative; width: 200px; height: 200px; margin: 20px auto; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: conic-gradient(var(--primary) 100%, var(--ring-bg) 0%); box-shadow: 0 0 20px rgba(168, 199, 250, 0.1); transition: background 1s linear; }
+        .timer-inner { position: absolute; width: 180px; height: 180px; background: var(--card-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 2; }
+        .timer-text { font-size: 42px; font-weight: bold; font-family: monospace; color: var(--text); }
+        .pulse { position: absolute; width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 0 0 rgba(168, 199, 250, 0.4); animation: pulsing 2s infinite; display: none; z-index: 1; }
+
+        /* AI 區 */
+        .chat-box { height: 400px; overflow-y: auto; padding: 15px; background: #131314; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .msg { margin-bottom: 12px; padding: 12px 16px; border-radius: 10px; max-width: 85%; line-height: 1.5; word-break: break-all; }
         .user-msg { background: #2b2a2a; margin-left: auto; text-align: right; }
-        .ai-msg { background: transparent; margin-right: auto; }
+        .ai-msg { background: transparent; margin-right: auto; color: #e3e3e3; }
         .ai-msg strong { color: var(--primary); }
 
-        /* 表格 */
+        /* YT Music */
+        .ytm-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border); }
+        .ytm-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
+        @keyframes pulsing { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 199, 250, 0.4); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(168, 199, 250, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 199, 250, 0); } }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
     <div id="login-section" class="card">
-        <h2>🔑 登入衝刺站</h2>
-        <input type="text" id="username-input" placeholder="輸入名字或管理員密碼...">
-        <button onclick="handleLogin()">登入</button>
+        <h2>登入</h2>
+        <input type="text" id="username-input" placeholder="輸入名稱或管理員密碼...">
+        <button onclick="handleLogin()" style="width:100%;">進入</button>
     </div>
 
     <div id="main-app">
-        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>歡迎，<span id="user-display" style="color:var(--primary)"></span></div>
-            <button onclick="handleLogout()" style="background:#444746; color:white; padding:6px 12px; font-size:14px;">登出</button>
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+            <div style="font-size: 18px;">使用者：<span id="user-display" style="color:var(--primary); font-weight:bold;"></span></div>
+            <button onclick="handleLogout()" class="secondary" style="padding: 8px 16px;">登出</button>
         </div>
 
         <div class="card">
-            <h3 style="margin:0; text-align:center;">⏱️ 距離段考倒數</h3>
-            <div class="countdown">
-                <div class="tile"><div class="tile-num" id="cd-d">00</div><div>天</div></div>
-                <div class="tile"><div class="tile-num" id="cd-h">00</div><div>時</div></div>
-                <div class="tile"><div class="tile-num" id="cd-m">00</div><div>分</div></div>
-                <div class="tile"><div class="tile-num" id="cd-s">00</div><div>秒</div></div>
+            <h3 style="margin-top:0;">⏱️ 倒數計時</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="cd-name" placeholder="名稱 (例如：會考、段考)" style="width: 200px; margin: 0;">
+                <input type="datetime-local" id="cd-date" style="width: 200px; margin: 0;">
+                <button onclick="addCountdown()">新增</button>
             </div>
+            <div class="countdown-list" id="countdown-display-area"></div>
         </div>
 
         <div class="grid">
             <div>
-                <div class="card">
-                    <h3>🎵 我的 YouTube Music</h3>
-                    <input type="text" id="ytm-url" placeholder="貼上你的 YT Music 歌單網址..." style="width:90%;">
-                    <button onclick="saveYtmUrl()" style="padding:8px 16px; font-size:14px; background:#444746; color:white;">儲存歌單</button>
-                    <button onclick="openYtm()" style="padding:8px 16px; font-size:14px; margin-left:5px;">打開音樂</button>
-                </div>
-
                 <div class="card" style="text-align: center;">
                     <h3 style="margin:0;">⏱️ 番茄鐘</h3>
-                    <div id="timer" style="font-size: 42px; font-weight: bold; margin: 10px 0;">25:00</div>
-                    <button onclick="toggleTimer()" id="start-btn">開始</button>
-                    <button onclick="resetTimer()" style="background:#444746; color:white; margin-left:5px;">重置</button>
+                    <div class="timer-container" id="timer-ring">
+                        <div class="pulse" id="pulse-bg"></div>
+                        <div class="timer-inner">
+                            <div class="timer-text" id="timer">25:00</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <button onclick="toggleTimer()" id="start-btn">開始</button>
+                        <button onclick="resetTimer()" class="secondary">重置</button>
+                    </div>
                 </div>
 
                 <div class="card">
-                    <h3>📋 考前核心急救卡</h3>
-                    <div class="flashcard-grid">
-                        <div class="flashcard" onclick="this.innerText=this.innerText.includes('公式')?'質量 ÷ 分子量':'理化：莫耳數公式'">理化：莫耳數公式</div>
-                        <div class="flashcard" onclick="this.innerText=this.innerText.includes('定理')?'外角和皆為 360°':'數學：外角和定理'">數學：外角和定理</div>
+                    <h3 style="margin:0;">🎵 音樂播放器</h3>
+                    <p style="font-size:12px; color:#aaa; margin: 5px 0 10px 0;">支援 YouTube 單曲或歌單分享網址，系統會自動轉換為內嵌格式。</p>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="ytm-url" placeholder="貼上網址..." style="margin:0; flex:1;">
+                        <button onclick="saveAndLoadYtm()">載入</button>
                     </div>
+                    <div id="ytm-player-area"></div>
                 </div>
             </div>
 
             <div class="card" style="display: flex; flex-direction: column;">
-                <h3>🤖 Gemini 風格學伴</h3>
+                <h3 style="margin-top:0;">AI</h3>
                 <div class="chat-box" id="chat-box"></div>
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" id="chat-input" placeholder="問點什麼..." onkeypress="if(event.key==='Enter') sendChat()" style="margin:0;">
+                    <input type="text" id="chat-input" placeholder="輸入訊息..." onkeypress="if(event.key==='Enter') sendChat()" style="margin:0; flex:1;">
                     <button onclick="sendChat()">發送</button>
                 </div>
             </div>
@@ -104,43 +116,42 @@
     </div>
 
     <div id="admin-dashboard" class="card">
-        <h2 style="color:var(--primary);">🛡️ 最高權限管理後台</h2>
+        <h2 style="color:var(--primary); margin-top:0;">🛡️ 後台管理系統</h2>
         <table>
             <thead>
-                <tr><th>使用者</th><th>狀態</th><th>番茄鐘次數</th><th>對話筆數</th></tr>
+                <tr><th>使用者</th><th>狀態</th><th>番茄鐘完成次數</th></tr>
             </thead>
             <tbody>
                 <tr>
-                    <td id="adm-curr-user"></td>
+                    <td id="adm-curr-user">-</td>
                     <td style="color:#2ecc71;">● 線上</td>
                     <td id="adm-sessions">0</td>
-                    <td id="adm-chats">0</td>
                 </tr>
             </tbody>
         </table>
-        <button onclick="handleLogout()" style="background:#444746; color:white;">退出</button>
+        <button onclick="handleLogout()" class="secondary" style="margin-top: 15px;">退出後台</button>
     </div>
 </div>
 
 <script>
-    let timerInterval, countdownInterval, timeLeft = 25 * 60, isRunning = false, currentUser = "";
-    const examDate = new Date(); examDate.setDate(examDate.getDate() + 4); // 預設4天後段考
+    let timerInterval, timeLeft = 25 * 60, totalTime = 25 * 60, isRunning = false, currentUser = "";
+    let savedCountdowns = [];
 
     window.onload = function() {
         const savedUser = localStorage.getItem("study_username");
         if(savedUser) { loginSuccess(savedUser); }
-        startCountdown();
+        setInterval(updateAllCountdowns, 1000);
     }
 
     function handleLogin() {
         const user = document.getElementById("username-input").value.trim();
         if(!user) return;
-        if(user === "admin123") {
+        
+        if(user === "aA01212012") {
             document.getElementById("login-section").style.display = "none";
             document.getElementById("admin-dashboard").style.display = "block";
-            document.getElementById("adm-curr-user").innerText = localStorage.getItem("study_username") || "無";
+            document.getElementById("adm-curr-user").innerText = localStorage.getItem("study_username") || "無資料";
             document.getElementById("adm-sessions").innerText = localStorage.getItem("tomato_sessions") || "0";
-            document.getElementById("adm-chats").innerText = JSON.parse(localStorage.getItem(`chat_history_${localStorage.getItem("study_username")}`)|| "[]").length;
             return;
         }
         localStorage.setItem("study_username", user);
@@ -152,43 +163,104 @@
         document.getElementById("login-section").style.display = "none";
         document.getElementById("main-app").style.display = "block";
         document.getElementById("user-display").innerText = user;
-        const savedUrl = localStorage.getItem(`ytm_url_${currentUser}`);
-        if(savedUrl) { document.getElementById("ytm-url").value = savedUrl; }
+        
+        const savedYtm = localStorage.getItem(`ytm_embed_${currentUser}`);
+        if(savedYtm) {
+            document.getElementById("ytm-url").value = savedYtm;
+            renderYtmEmbed(savedYtm);
+        }
+        savedCountdowns = JSON.parse(localStorage.getItem(`countdowns_${currentUser}`) || "[]");
+        renderCountdowns();
         loadChatHistory();
     }
 
     function handleLogout() { localStorage.removeItem("study_username"); location.reload(); }
 
-    function saveYtmUrl() {
-        const url = document.getElementById("ytm-url").value.trim();
-        localStorage.setItem(`ytm_url_${currentUser}`, url);
-        alert("歌單網址已儲存！");
-    }
-
-    function openYtm() {
-        const url = document.getElementById("ytm-url").value.trim() || "https://music.youtube.com/";
-        window.open(url, '_blank');
-    }
-
-    function startCountdown() {
-        function updateCd() {
-            const diff = examDate.getTime() - new Date().getTime();
-            if(diff <= 0) return;
-            document.getElementById("cd-d").innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
-            document.getElementById("cd-h").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-            document.getElementById("cd-m").innerText = Math.floor((diff % 3600000) / 600000).toString().padStart(2, '0');
-            document.getElementById("cd-s").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+    // YT Music 自動格式化
+    function saveAndLoadYtm() {
+        let url = document.getElementById("ytm-url").value.trim();
+        if(!url) return;
+        
+        // 自動轉換各種 YT 網址變成 embed
+        if(url.includes("youtu.be/")) {
+            url = url.replace("youtu.be/", "www.youtube.com/embed/");
+        } else if(url.includes("watch?v=")) {
+            const urlObj = new URL(url);
+            const vid = urlObj.searchParams.get("v");
+            const list = urlObj.searchParams.get("list");
+            url = list ? `https://www.youtube.com/embed/videoseries?list=${list}` : `https://www.youtube.com/embed/${vid}`;
+        } else if(url.includes("playlist?list=")) {
+            const urlObj = new URL(url);
+            url = `https://www.youtube.com/embed/videoseries?list=${urlObj.searchParams.get("list")}`;
         }
-        updateCd(); setInterval(updateCd, 1000);
+
+        localStorage.setItem(`ytm_embed_${currentUser}`, url);
+        renderYtmEmbed(url);
     }
 
+    function renderYtmEmbed(url) {
+        document.getElementById("ytm-player-area").innerHTML = `<div class="ytm-container"><iframe src="${url}" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>`;
+    }
+
+    // 倒數計時
+    function addCountdown() {
+        const name = document.getElementById("cd-name").value.trim();
+        const dateStr = document.getElementById("cd-date").value;
+        if(!name || !dateStr) return;
+        savedCountdowns.push({ id: Date.now(), name: name, target: new Date(dateStr).getTime() });
+        localStorage.setItem(`countdowns_${currentUser}`, JSON.stringify(savedCountdowns));
+        document.getElementById("cd-name").value = ""; document.getElementById("cd-date").value = "";
+        renderCountdowns();
+    }
+
+    function deleteCountdown(id) {
+        savedCountdowns = savedCountdowns.filter(c => c.id !== id);
+        localStorage.setItem(`countdowns_${currentUser}`, JSON.stringify(savedCountdowns));
+        renderCountdowns();
+    }
+
+    function renderCountdowns() {
+        const area = document.getElementById("countdown-display-area");
+        area.innerHTML = savedCountdowns.map(c => `
+            <div class="cd-item" id="item-${c.id}">
+                <span class="del-btn" onclick="deleteCountdown(${c.id})">✖</span>
+                <div class="cd-title">${c.name}</div>
+                <div class="cd-time" id="time-run-${c.id}">計算中...</div>
+            </div>
+        `).join('');
+        updateAllCountdowns();
+    }
+
+    function updateAllCountdowns() {
+        savedCountdowns.forEach(c => {
+            const el = document.getElementById(`time-run-${c.id}`);
+            if(!el) return;
+            const diff = c.target - new Date().getTime();
+            if(diff <= 0) { el.innerText = "已截止"; el.style.color = "var(--accent)"; return; }
+            const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
+            el.innerText = `${d}天 ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        });
+    }
+
+    // 圓環動畫番茄鐘
     function toggleTimer() {
-        if(isRunning) { clearInterval(timerInterval); document.getElementById("start-btn").innerText = "繼續"; } 
-        else {
+        const ring = document.getElementById("timer-ring");
+        const pulse = document.getElementById("pulse-bg");
+        
+        if(isRunning) {
+            clearInterval(timerInterval);
+            document.getElementById("start-btn").innerText = "繼續";
+            pulse.style.display = "none";
+        } else {
+            pulse.style.display = "block";
             timerInterval = setInterval(() => {
-                if(timeLeft > 0) { timeLeft--; updateTimerDisplay(); } 
-                else {
-                    clearInterval(timerInterval); alert("番茄鐘結束！");
+                if(timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    let percent = (timeLeft / totalTime) * 100;
+                    ring.style.background = `conic-gradient(var(--primary) ${percent}%, var(--ring-bg) ${percent}%)`;
+                } else {
+                    clearInterval(timerInterval); alert("時間到！");
                     localStorage.setItem("tomato_sessions", parseInt(localStorage.getItem("tomato_sessions") || "0") + 1);
                     resetTimer();
                 }
@@ -197,16 +269,24 @@
         }
         isRunning = !isRunning;
     }
-    function resetTimer() { clearInterval(timerInterval); timeLeft = 25 * 60; isRunning = false; document.getElementById("start-btn").innerText = "開始"; updateTimerDisplay(); }
+
+    function resetTimer() {
+        clearInterval(timerInterval); timeLeft = totalTime; isRunning = false;
+        document.getElementById("start-btn").innerText = "開始";
+        document.getElementById("pulse-bg").style.display = "none";
+        document.getElementById("timer-ring").style.background = `conic-gradient(var(--primary) 100%, var(--ring-bg) 0%)`;
+        updateTimerDisplay();
+    }
     function updateTimerDisplay() { document.getElementById("timer").innerText = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`; }
 
+    // AI
     function sendChat() {
         const input = document.getElementById("chat-input"); const text = input.value.trim(); if(!text) return;
         appendMessage(text, 'user-msg'); input.value = "";
         setTimeout(() => {
-            let reply = text.includes("出題") ? "**題目：** 凸五邊形的內角和是多少度？\n\n*(提示：公式為 $(n-2) \\times 180$ )*" : `加油 **${currentUser}**，專注當下，段考沒問題的！`;
+            let reply = `收到。繼續保持專注。`;
             appendMessage(reply, 'ai-msg'); saveChat(text, reply);
-        }, 500);
+        }, 300);
     }
     function appendMessage(text, className) {
         const box = document.getElementById("chat-box"); const div = document.createElement("div");
