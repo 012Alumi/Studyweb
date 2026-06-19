@@ -51,15 +51,12 @@
 <body>
 
 <div class="wrapper">
-    <!-- 登入介面 -->
     <div id="login-section" class="card">
         <h2>登入</h2>
-        <!-- 新增了按 Enter 也能登入的功能 -->
         <input type="text" id="username-input" placeholder="輸入名稱或管理員密碼..." onkeypress="if(event.key==='Enter') handleLogin()">
         <button onclick="handleLogin()" style="width:100%;">進入</button>
     </div>
 
-    <!-- 主程式介面 -->
     <div id="main-app">
         <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
             <div style="font-size: 18px;">使用者：<span id="user-display" style="color:var(--primary); font-weight:bold;"></span></div>
@@ -93,7 +90,7 @@
                 </div>
 
                 <div class="card">
-                    <h3 style="margin:0;">🎵 音樂播放器</h3>
+                    <h3 style="margin:0;">🎵 音學播放器</h3>
                     <div style="display: flex; gap: 8px; margin-top: 10px;">
                         <input type="text" id="ytm-url" placeholder="貼上 YouTube 網址..." style="margin:0; flex:1;">
                         <button onclick="saveAndLoadYtm()">載入</button>
@@ -103,7 +100,7 @@
             </div>
 
             <div class="card" style="display: flex; flex-direction: column;">
-                <h3 style="margin-top:0;">AI 諮詢區</h3>
+                <h3>AI 諮詢區</h3>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
                     <input type="password" id="api-key-input" placeholder="請貼上你的 API Key (AQ. 開頭)..." style="margin:0; font-size:12px; flex:1;">
                     <button onclick="saveApiKey()" style="padding:0 10px; font-size:12px; background:var(--border); color:var(--text);">儲存 Key</button>
@@ -118,7 +115,6 @@
         </div>
     </div>
 
-    <!-- 管理員後台 -->
     <div id="admin-dashboard" class="card">
         <h2 style="color:var(--primary); margin-top:0;">🛡️ 後台管理系統</h2>
         <table>
@@ -266,7 +262,7 @@
     }
     function updateTimerDisplay() { document.getElementById("timer").innerText = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`; }
 
-    // 升級版 AI 抓 Bug 程式碼
+    // 已修正模型名稱為 gemini-1.5-flash-latest 的程式碼
     async function sendChat() {
         const input = document.getElementById("chat-input");
         const text = input.value.trim();
@@ -290,7 +286,7 @@
         box.scrollTop = box.scrollHeight;
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
